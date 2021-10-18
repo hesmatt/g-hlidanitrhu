@@ -1,12 +1,12 @@
 {
-    "name": "matt/sygrid",
-    "description": "A simple, yet effective and functional DATA grid for Symfony 5+",
+    "name": "matt/g-hlidanitrhu",
+    "description": "Grid pro hlídaní trhu",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
-            "name": "Matt",
-            "email": "contact@projectsfrommatt.com"
+            "name": "Matěj",
+            "email": "matej.plavina@lemenio.com"
         }
     ],
     "minimum-stability": "stable",
