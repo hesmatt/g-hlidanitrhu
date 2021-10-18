@@ -1,0 +1,52 @@
+<link href="{{ asset('bundles/sygrid/assets/css/gridjs.css') }}" rel="stylesheet"/>
+{% if customStyle is not null %}
+    <link href="{{ customStyle | raw }}" rel="stylesheet"/>
+{% endif %}
+
+<div id="{{ gridId }}"></div>
+
+<script src="{{ asset('bundles/sygrid/assets/js/gridjs.js') }}"></script>
+<script>
+    new gridjs.Grid({
+        columns: [
+            {% for column in columns %}
+            {
+                name: '{{ column.getTitle() ?? column.getKey() }}'
+            },
+            {% endfor %}
+            {% for action, settings in actions %}
+            {
+                name: 'Actions',
+                formatter: ({{ settings.functionParameters ?? 'cell, row' | raw }}) => {
+                    {{ settings.return | raw }}
+                }
+            },
+            {% endfor %}
+        ],
+        {% if paging %}
+        pagination: {
+            enabled: true,
+            limit: {{ limit }},
+            server: {
+                url: (prev, page, limit) => {
+                    return `{{ serverUrl | raw }}&limit=${limit}&offset=${page * limit}`;
+                }
+            }
+        },
+        {% endif %}
+        {% if serverUrl is not same as null %}
+        server: {
+            url: '{{ serverUrl | raw }}',
+            then: data => data.results.map(result => {
+                console.log(result);
+                return [
+                    {% for column in columns %}
+                    result.{{ column.getKey() }},
+                    {% endfor %}
+                ];
+            }),
+            total: data => data.count
+        },
+        {% endif %}
+    }).render(document.getElementById("{{ gridId }}"));
+</script>

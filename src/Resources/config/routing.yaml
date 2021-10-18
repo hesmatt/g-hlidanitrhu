@@ -1,0 +1,3 @@
+sygrid_get_data:
+  path: /sygrid/data/get/source={source}&sourceType={sourceType}&limit={limit}&offset={offset}
+  controller: sygrid.controller.grid::getAction

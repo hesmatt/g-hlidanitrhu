@@ -1,0 +1,1 @@
+//TODO: Tady později injectnout vše co je potřeba pro funkcni v jednom js, tzn defaultni AJAX regy a takove veci

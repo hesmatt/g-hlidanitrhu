@@ -1,0 +1,27 @@
+{
+    "name": "matt/sygrid",
+    "description": "A simple, yet effective and functional DATA grid for Symfony 5+",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Matt",
+            "email": "contact@projectsfrommatt.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "Matt\\SyGridBundle\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.4",
+        "symfony/framework-bundle": "^5.2",
+        "symfony/twig-bundle": "^5.3",
+        "doctrine/orm": "^2.10",
+        "symfony/yaml": "^5.3",
+        "symfony/cache": "^5.3",
+        "opis/closure": "^3.6"
+    }
+}
