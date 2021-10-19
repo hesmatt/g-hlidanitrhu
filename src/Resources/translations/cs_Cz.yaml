@@ -15,3 +15,5 @@ pagination:
 loading: "Načítání..."
 noRecordsFound: "Nebyly nalezeny žádné odpovídající záznamy"
 error: "Při získávání dat nastala chyba"
+actions:
+  name: "Akce"

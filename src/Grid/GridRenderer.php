@@ -4,10 +4,9 @@ namespace Matt\SyGridBundle\Grid;
 
 class GridRenderer
 {
-    //TODO: Přidat možnost searche
-    //TODO: Přidat lokalizaci
     private \Twig\Environment $environment;
-    private ?string $id = null;
+    private string $id = 'syGrid';
+    private string $variableName = 'grid';
     private ?string $serverUrl = null;
     private ?string $customStyle = null;
     private bool $paging = true;
@@ -31,9 +30,9 @@ class GridRenderer
     }
 
     /**
-     * @param string|null $id
+     * @param string $id
      */
-    public function setId(?string $id): void
+    public function setId(string $id): void
     {
         $this->id = $id;
     }
@@ -79,6 +78,15 @@ class GridRenderer
     }
 
     /**
+     * @param string $variableName
+     * Sets variable name of the GRID that can later be referenced in and via JS
+     */
+    public function setVariableName(string $variableName): void
+    {
+        $this->variableName = $variableName;
+    }
+
+    /**
      * @param string|null $language
      * @throws \Exception
      */
@@ -110,8 +118,6 @@ class GridRenderer
         if ($dataGetter !== null) {
             $column->setDataGetter(true);
             $this->cacheManager->cacheColumnDataGetter(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($this->sourceManager->sourceClass) . "." . $key, $dataGetter);
-
-            dump($this->cacheManager->cacheColumnDataGetter(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($this->sourceManager->sourceClass) . "." . $key));
         }
 
         $this->sourceManager->columns[] = $column;
@@ -164,20 +170,18 @@ class GridRenderer
     public function render(): string
     {
         $this->cacheManager->cacheColumns(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($this->sourceManager->sourceClass), $this->sourceManager->columns);
-
-        dump($this->language->getTranslations());
-
         return $this->environment->render('@SyGrid/Grid/grid.html.twig',
             [
                 'serverUrl' => $this->serverUrl ?? $this->getServerUrl(),
-                'gridId' => $this->id ?? 'SyGrid',
+                'gridId' => $this->id,
                 'paging' => $this->paging,
                 'limit' => $this->limit,
                 'columns' => $this->sourceManager->columns,
                 'actions' => $this->sourceManager->actions,
                 'customStyle' => $this->customStyle,
                 'search' => $this->search,
-                'language' => $this->language
+                'language' => $this->language,
+                'variableName' => $this->variableName
             ]);
     }
 }

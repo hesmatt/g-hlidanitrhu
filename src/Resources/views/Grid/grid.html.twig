@@ -7,6 +7,13 @@
 
 <script src="{{ asset('bundles/sygrid/assets/js/gridjs.js') }}"></script>
 <script>
+    {% if language is not same as null %}
+        {% set translations = language.getTranslations() %}
+    {% else %}
+        {% set translations = null %}
+    {% endif %}
+
+    const {{ variableName | raw }} =
     new gridjs.Grid({
         columns: [
             {% for column in columns %}
@@ -20,7 +27,7 @@
             {% endfor %}
             {% for action, settings in actions %}
             {
-                name: 'Actions',
+                name: '{{ translations.actions.name ?? 'Actions' }}',
                 formatter: {{ settings.formatter | raw }}
             },
             {% endfor %}
@@ -54,8 +61,7 @@
             total: data => data.count
         },
         {% endif %}
-        {% if language is not same as null %}
-        {% set translations = language.getTranslations() %}
+        {% if translations is not same as null %}
         language: {
             search: {
                 placeholder: '{{ translations.search.placeholder }}'
