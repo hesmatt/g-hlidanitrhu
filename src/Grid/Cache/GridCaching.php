@@ -4,7 +4,6 @@ namespace Matt\SyGridBundle\Grid\Cache;
 
 final class GridCaching
 {
-    //TODO: This caching class does not work properly so far, only some dummy data are stored here.
     private \Symfony\Component\Cache\Adapter\FilesystemAdapter $cache;
 
     public function __construct()
@@ -12,28 +11,13 @@ final class GridCaching
         $this->cache = new \Symfony\Component\Cache\Adapter\FilesystemAdapter();
     }
 
-    public function getCachedSourceSettings($source, $settings = null)
-    {
-        return $this->cacheSourceSettings($source, $settings);
-    }
-
-    private function cacheSourceSettings($source, $settings = null)
-    {
-        return $settings;
-        //TODO: Tenhle caching je špatně! Nikdy to nevrati spravnou věc
-//        $item = $this->cache->getItem(str_replace(':', '-', $source) . ".columnSettingsCaching");
-//
-//        if($item !== null)
-//        {
-//            return $item;
-//        }
-
-//        return $this->cache->get(str_replace(':', '-', $source) . ".columnSettingsCaching", function (\Symfony\Contracts\Cache\ItemInterface $item) use ($source, $settings) {
-//            dump($settings);
-//            return $settings;
-//        });
-    }
-
+    /**
+     * @param string $source
+     * @param array|null $columns
+     * @return mixed
+     * @throws \Psr\Cache\InvalidArgumentException
+     * Caches all the columns, their return types, callback and stuff.
+     */
     public function cacheColumns(string $source, ?array $columns = null)
     {
         $identifier = \str_replace(':', '-', $source) . ".gridColumnsCaching";

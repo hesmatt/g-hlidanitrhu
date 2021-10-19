@@ -1,0 +1,17 @@
+search:
+  placeholder: "Hledaný výraz"
+sort:
+  sortAsc: "Seřadit sestupně"
+  sortDesc: "Seřadit vzestupně"
+pagination:
+  previous: "Předchozí"
+  next: "Další"
+  navigate: "Stránka ${page} ze stránky ${pages}"
+  page: "Stránka ${page}"
+  showing: "Zobrazeno"
+  of: "ze"
+  to: "do"
+  results: "výsledků"
+loading: "Načítání..."
+noRecordsFound: "Nebyly nalezeny žádné odpovídající záznamy"
+error: "Při získávání dat nastala chyba"

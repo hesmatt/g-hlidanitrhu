@@ -9,11 +9,13 @@ class GridRenderer
     private \Twig\Environment $environment;
     private ?string $id = null;
     private ?string $serverUrl = null;
+    private ?string $customStyle = null;
     private bool $paging = true;
+    private bool $search = true;
     private int $limit = 20;
     private ?\Matt\SyGridBundle\Grid\Source\AbstractGridSourceManager $sourceManager = null;
-    private ?string $customStyle = null;
     private \Matt\SyGridBundle\Grid\Cache\GridCaching $cacheManager;
+    private ?Language\GridLanguage $language = null;
 
     public function __construct()
     {
@@ -66,6 +68,29 @@ class GridRenderer
     public function setCustomStyle(string $customStyle): void
     {
         $this->customStyle = $customStyle;
+    }
+
+    /**
+     * @param bool $search
+     */
+    public function setSearch(bool $search): void
+    {
+        $this->search = $search;
+    }
+
+    /**
+     * @param string|null $language
+     * @throws \Exception
+     */
+    public function setLanguage(string $language): void
+    {
+        if (\file_exists(__DIR__ . "/../Resources/translations/{$language}.yaml")) {
+            $gridLanguage = new Language\GridLanguage();
+            $gridLanguage->setTranslations(\Symfony\Component\Yaml\Yaml::parseFile(__DIR__ . "/../Resources/translations/{$language}.yaml"));
+            $this->language = $gridLanguage;
+        } else {
+            throw new \Exception("Language {$language} does not exist!");
+        }
     }
 
     /**
@@ -126,7 +151,7 @@ class GridRenderer
     {
         //TODO: Remove the hardcoded sourceType and add a custom sourceType depending on the users choice, however, we do not have more choices yet.
         $escapedSourceClass = \Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($this->sourceManager->sourceClass);
-        return $this->serverUrl ?? "/sygrid/data/get/source={$escapedSourceClass}&sourceType=Entity";
+        return $this->serverUrl ?? "/sygrid/data/get?source={$escapedSourceClass}&sourceType=Entity";
     }
 
     /**
@@ -138,9 +163,9 @@ class GridRenderer
      */
     public function render(): string
     {
-        $this->cacheManager->cacheColumns(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($this->sourceManager->sourceClass),$this->sourceManager->columns);
+        $this->cacheManager->cacheColumns(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($this->sourceManager->sourceClass), $this->sourceManager->columns);
 
-        dump($this->cacheManager->cacheColumns(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($this->sourceManager->sourceClass),$this->sourceManager->columns));
+        dump($this->language->getTranslations());
 
         return $this->environment->render('@SyGrid/Grid/grid.html.twig',
             [
@@ -150,7 +175,9 @@ class GridRenderer
                 'limit' => $this->limit,
                 'columns' => $this->sourceManager->columns,
                 'actions' => $this->sourceManager->actions,
-                'customStyle' => $this->customStyle
+                'customStyle' => $this->customStyle,
+                'search' => $this->search,
+                'language' => $this->language
             ]);
     }
 }

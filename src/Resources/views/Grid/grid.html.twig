@@ -11,26 +11,33 @@
         columns: [
             {% for column in columns %}
             {
-                name: '{{ column.getTitle() ?? column.getKey() }}'
+                name: '{{ column.getTitle() ?? column.getKey() }}',
+                {% if column.getFormatter() is not same as null %}
+                formatter: {{ column.getFormatter().getCallback() | raw }}
+                {% endif %}
+
             },
             {% endfor %}
             {% for action, settings in actions %}
             {
                 name: 'Actions',
-                formatter: ({{ settings.functionParameters ?? 'cell, row' | raw }}) => {
-                    {{ settings.return | raw }}
-                }
+                formatter: {{ settings.formatter | raw }}
             },
             {% endfor %}
         ],
+        {% if search %}
+        search: {
+            server: {
+                url: (prev, keyword) => `${prev}&search=${keyword}`
+            }
+        },
+        {% endif %}
         {% if paging %}
         pagination: {
             enabled: true,
             limit: {{ limit }},
             server: {
-                url: (prev, page, limit) => {
-                    return `{{ serverUrl | raw }}&limit=${limit}&offset=${page * limit}`;
-                }
+                url: (prev, page, limit) => `${prev}&limit=${limit}&offset=${page * limit}`
             }
         },
         {% endif %}
@@ -38,7 +45,6 @@
         server: {
             url: '{{ serverUrl | raw }}',
             then: data => data.results.map(result => {
-                console.log(result);
                 return [
                     {% for column in columns %}
                     result.{{ column.getKey() }},
@@ -47,6 +53,31 @@
             }),
             total: data => data.count
         },
+        {% endif %}
+        {% if language is not same as null %}
+        {% set translations = language.getTranslations() %}
+        language: {
+            search: {
+                placeholder: '{{ translations.search.placeholder }}'
+            },
+            sort: {
+                sortAsc: '{{ translations.sort.sortAsc }}',
+                sortDesc: '{{ translations.sort.sortDesc }}',
+            },
+            pagination: {
+                previous: '{{ translations.pagination.previous }}',
+                next: '{{ translations.pagination.next }}',
+                navigate: (page, pages) => `{{ translations.pagination.navigate | raw }}`,
+                page: (page) => `{{ translations.pagination.page | raw }}`,
+                showing: '{{ translations.pagination.showing }}',
+                of: '{{ translations.pagination.of }}',
+                to: '{{ translations.pagination.to }}',
+                results: '{{ translations.pagination.results }}',
+            },
+            loading: '{{ translations.loading }}',
+            noRecordsFound: '{{ translations.noRecordsFound }}',
+            error: '{{ translations.error }}',
+        }
         {% endif %}
     }).render(document.getElementById("{{ gridId }}"));
 </script>

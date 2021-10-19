@@ -7,6 +7,7 @@ abstract class AbstractGridSourceManager
     protected $source;
     protected ?int $offset = null;
     protected ?int $limit = null;
+    protected ?string $search = null;
 
     public array $columns = [];
     public array $actions = [];
@@ -26,6 +27,14 @@ abstract class AbstractGridSourceManager
     public function setLimit(?int $limit): void
     {
         $this->limit = $limit;
+    }
+
+    /**
+     * @param string|null $search
+     */
+    public function setSearch(?string $search): void
+    {
+        $this->search = $search;
     }
 
     /**
@@ -55,7 +64,7 @@ abstract class AbstractGridSourceManager
                     $this->processConfigColumns($sourceConfiguration['columns']);
                 }
                 if (isset($sourceConfiguration['actions'])) {
-                    //TODO: Udělat processor pro actions
+                    //TODO: Make a processor for actions, same as processor for Column
                     $this->actions = $sourceConfiguration['actions'];
                 }
             }
@@ -83,6 +92,11 @@ abstract class AbstractGridSourceManager
         return implode($connector, $fields);
     }
 
+    private function processConfigActions(array $actions): void
+    {
+        //TODO: Add similar processor as columns have, with the exception that it'll be for actions
+    }
+
     /**
      * @param array $columns
      * @return void
@@ -106,6 +120,14 @@ abstract class AbstractGridSourceManager
                 }
                 if (isset($columnSettings['keyReflected'])) {
                     $column->setReflectedKey($columnSettings['keyReflected']);
+                }
+                if (isset($columnSettings['formatter'])) {
+                    $formatter = new \Matt\SyGridBundle\Grid\Formatter\GridFormatter();
+                    $formatter->setCallback($columnSettings['formatter']);
+                    $column->setFormatter($formatter);
+                }
+                if (isset($columnSettings['searchable'])) {
+                    $column->setSearchable($columnSettings['searchable']);
                 }
                 $this->columns[] = $column;
             }

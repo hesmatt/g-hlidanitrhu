@@ -17,6 +17,8 @@ class EntityGridSourceManager extends AbstractGridSourceManager
     /**
      * @param $entityClass
      * @return void
+     * @throws \Psr\Cache\InvalidArgumentException
+     * Sets the source and assigns values from config or manual settings to it
      */
     public function setSource($entityClass)
     {
@@ -29,22 +31,29 @@ class EntityGridSourceManager extends AbstractGridSourceManager
 
     /**
      * @return int
+     * Counts all available results, so that there's a proper paging
      */
     public function getCount(): int
     {
-        return count($this->entityManager->getRepository(get_class($this->source))->findAll());
+        if ($this->search === null) {
+            return count($this->entityManager->getRepository(get_class($this->source))->findAll());
+        } else {
+            return count($this->getData());
+        }
     }
 
     /**
      * @return array
+     * Gets all data via query
      */
     public function getData(): array
     {
-        return $this->getQuery($this->limit, $this->offset)->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+        return $this->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
     /**
      * @return \Doctrine\ORM\Query
+     * Builds and query for entity source
      */
     private function getQuery(): \Doctrine\ORM\Query
     {
@@ -56,6 +65,17 @@ class EntityGridSourceManager extends AbstractGridSourceManager
         if ($this->limit !== null && $this->offset !== null) {
             $queryBuilder->setMaxResults($this->limit)
                 ->setFirstResult($this->offset);
+        }
+        if ($this->search != null) {
+            /**
+             * @var $column \Matt\SyGridBundle\Grid\Column\GridColumn
+             */
+            foreach ($this->columns as $column) {
+                if ($column->isSearchable() && ($column->isReflected() || $column->isReflectedKey())) {
+                    $queryBuilder->orWhere("qb.{$column->getKey()} LIKE :search");
+                    $queryBuilder->setParameter('search', "%{$this->search}%");
+                }
+            }
         }
         return $queryBuilder->getQuery();
     }

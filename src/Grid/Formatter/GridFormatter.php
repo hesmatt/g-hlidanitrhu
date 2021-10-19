@@ -4,21 +4,24 @@ namespace Matt\SyGridBundle\Grid\Formatter;
 
 class GridFormatter
 {
-    private string $return;
+    private string $callback;
 
     /**
-     * @param string $return
+     * @param string $callback
+     * @return GridFormatter
      */
-    public function setReturn(string $return): void
+    public function setCallback(string $callback): GridFormatter
     {
-        $this->return = $return;
+        $this->callback = $callback;
+
+        return $this;
     }
 
     /**
      * @return string
      */
-    public function getReturn(): string
+    public function getCallback(): string
     {
-        return $this->return;
+        return $this->callback;
     }
 }
