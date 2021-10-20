@@ -22,27 +22,26 @@ class GridController extends \Symfony\Bundle\FrameworkBundle\Controller\Abstract
         $offset = (int)$request->query->get('offset', null);
         $search = $request->query->get('search', null);
 
-        if ($source === null || $sourceType === null)
-        {
-            return new \Symfony\Component\HttpFoundation\Response('Missing required parameters', 403);;
+        if ($source === null || $sourceType === null) {
+            return new \Symfony\Component\HttpFoundation\Response('Missing required parameters', 403);
         }
 
         if ($sourceType === 'Entity') {
+            //TODO: Add better injector, so that it automatically injects data from cached parameters of source
             $gridSource = new \Matt\SyGridBundle\Grid\Source\EntityGridSourceManager();
             $gridSource->setEntityManager($this->entityManager);
             $gridSource->setSource($source);
             $gridSource->setLimit($limit);
             $gridSource->setOffset($offset);
+            $gridSource->setWhere($this->cacheManager->cacheSourceParameters(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($source))['where']);
 
-            if($search !== null)
-            {
+            if ($search !== null) {
                 $gridSource->setSearch($search);
             }
 
             if (($columns = $this->cacheManager->cacheColumns(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($source))) !== null) {
                 $gridSource->setColumns($columns);
             }
-
             $results = $gridSource->getData();
             foreach ($gridSource->columns as $column) {
                 if (!$column->isReflected()) {
@@ -56,7 +55,7 @@ class GridController extends \Symfony\Bundle\FrameworkBundle\Controller\Abstract
             }
             return $this->json(['results' => $results, 'count' => $gridSource->getCount()]);
         } else {
-            return new \Symfony\Component\HttpFoundation\Response('Non existing source type', 403);;
+            return new \Symfony\Component\HttpFoundation\Response('Non existing source type', 403);
         }
 
         return new \Symfony\Component\HttpFoundation\Response();

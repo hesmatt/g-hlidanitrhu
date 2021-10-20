@@ -170,7 +170,7 @@ class GridRenderer
      */
     public function render(): string
     {
-        $this->cacheManager->cacheColumns(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($this->sourceManager->sourceClass), $this->sourceManager->columns);
+        $this->cacheNeededParameters();
         return $this->environment->render('@SyGrid/Grid/grid.html.twig',
             [
                 'serverUrl' => $this->serverUrl ?? $this->getServerUrl(),
@@ -184,5 +184,11 @@ class GridRenderer
                 'language' => $this->language,
                 'variableName' => $this->variableName
             ]);
+    }
+
+    private function cacheNeededParameters()
+    {
+        $this->cacheManager->cacheColumns(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($this->sourceManager->sourceClass), $this->sourceManager->columns);
+        $this->cacheManager->cacheSourceParameters(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($this->sourceManager->sourceClass),$this->sourceManager->getCacheableParams());
     }
 }

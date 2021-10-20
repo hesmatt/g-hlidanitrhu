@@ -58,13 +58,33 @@ final class GridCaching
      */
     public function cacheColumnDataGetter(string $identifier, ?callable $dataGetter = null)
     {
-        $identifier = \str_replace(':', '-', $identifier);
+        $identifier = \str_replace(':', '-', $identifier) . ".gridColumnDataGetterCaching";
         if ($dataGetter === null) {
             return $this->cache->getItem($identifier)->get();
         } else {
             $this->cache->deleteItem($identifier);
             return $this->cache->get($identifier, function (\Symfony\Contracts\Cache\ItemInterface $item) use ($dataGetter) {
                 return new \Opis\Closure\SerializableClosure($dataGetter);
+            });
+        }
+    }
+
+    /**
+     * @param string $identifier
+     * @param array|null $params
+     * @return mixed
+     * @throws \Psr\Cache\InvalidArgumentException
+     * Caches all cacheable source parameters
+     */
+    public function cacheSourceParameters(string $identifier, array $params = null)
+    {
+        $identifier = \str_replace(':', '-', $identifier) . ".gridSourceParamsCaching";
+        if ($params === null) {
+            return $this->cache->getItem($identifier)->get();
+        } else {
+            $this->cache->deleteItem($identifier);
+            return $this->cache->get($identifier, function () use ($params) {
+                return $params;
             });
         }
     }

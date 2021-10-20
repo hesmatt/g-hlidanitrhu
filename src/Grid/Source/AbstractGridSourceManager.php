@@ -47,6 +47,15 @@ abstract class AbstractGridSourceManager
         $this->columns = $columns;
     }
 
+    public function getCacheableParams(): array
+    {
+        return [
+            'offset' => $this->offset,
+            'limit' => $this->limit,
+            'search' => $this->search
+        ];
+    }
+
     /**
      * @return void
      * Reads the configuration from Symfony config folder

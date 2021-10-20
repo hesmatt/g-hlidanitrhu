@@ -45,7 +45,7 @@ class EntityGridSourceManager extends AbstractGridSourceManager
      */
     public function getCount(): int
     {
-        if ($this->search === null) {
+        if ($this->search === null && count($this->where) == 0) {
             return count($this->entityManager->getRepository(get_class($this->source))->findAll());
         } else {
             return count($this->getData());
@@ -59,6 +59,13 @@ class EntityGridSourceManager extends AbstractGridSourceManager
     public function getData(): array
     {
         return $this->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+    }
+
+    public function getCacheableParams(): array
+    {
+        $params = parent::getCacheableParams();
+        $params['where'] = $this->where;
+        return $params;
     }
 
     /**
@@ -81,7 +88,7 @@ class EntityGridSourceManager extends AbstractGridSourceManager
              * @var $column \Matt\SyGridBundle\Grid\Column\GridColumn
              */
             foreach ($this->columns as $column) {
-                if ($column->isSearchable() && ($column->getReflectionKey() !== null)) {
+                if ($column->isSearchable() && ($column->isReflected() || $column->isReflectedKey())) {
                     $queryBuilder->orWhere("qb.{$column->getKey()} LIKE :search");
                     $queryBuilder->setParameter('search', "%{$this->search}%");
                 }
