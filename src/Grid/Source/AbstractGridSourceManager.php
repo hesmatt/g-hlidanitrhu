@@ -97,7 +97,6 @@ abstract class AbstractGridSourceManager
                 $fields[] = $prepend . $column->getKey();
             }
         }
-
         return implode($connector, $fields);
     }
 

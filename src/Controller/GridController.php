@@ -34,6 +34,7 @@ class GridController extends \Symfony\Bundle\FrameworkBundle\Controller\Abstract
             $gridSource->setLimit($limit);
             $gridSource->setOffset($offset);
             $gridSource->setWhere($this->cacheManager->cacheSourceParameters(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($source))['where']);
+            $gridSource->addFields($this->cacheManager->cacheSourceParameters(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($source))['fields']);
 
             if ($search !== null) {
                 $gridSource->setSearch($search);
@@ -44,7 +45,7 @@ class GridController extends \Symfony\Bundle\FrameworkBundle\Controller\Abstract
             }
             $results = $gridSource->getData();
             foreach ($gridSource->columns as $column) {
-                if (!$column->isReflected()) {
+                if ($column->hasDataGetter()) {
                     foreach ($results as &$result) {
                         $cachedFunction = $this->cacheManager->cacheColumnDataGetter(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($source) . "." . $column->getKey());
                         if ($cachedFunction !== null) {
@@ -57,8 +58,6 @@ class GridController extends \Symfony\Bundle\FrameworkBundle\Controller\Abstract
         } else {
             return new \Symfony\Component\HttpFoundation\Response('Non existing source type', 403);
         }
-
-        return new \Symfony\Component\HttpFoundation\Response();
     }
 
 }

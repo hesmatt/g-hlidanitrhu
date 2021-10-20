@@ -2,10 +2,13 @@
 
 namespace Matt\SyGridBundle\Grid\Source;
 
+use Exception;
+
 class EntityGridSourceManager extends AbstractGridSourceManager
 {
     private \Doctrine\ORM\EntityManager $entityManager;
     private array $where = [];
+    private array $fields = [];
 
     /**
      * @param \Doctrine\ORM\EntityManager $entityManager
@@ -30,6 +33,8 @@ class EntityGridSourceManager extends AbstractGridSourceManager
         $this->readConfigurationForSource();
     }
 
+    //TODO: Add better where, this one does not work at all
+
     /**
      * @param array $where
      * Allows you to set WHERE for the query
@@ -37,6 +42,16 @@ class EntityGridSourceManager extends AbstractGridSourceManager
     public function setWhere(array $where): void
     {
         $this->where = $where;
+    }
+
+    /**
+     * @param array $fields
+     * @return void
+     * Adds selected fields into query selection
+     */
+    public function addFields(array $fields)
+    {
+        $this->fields = array_merge($this->fields, $fields);
     }
 
     /**
@@ -58,14 +73,32 @@ class EntityGridSourceManager extends AbstractGridSourceManager
      */
     public function getData(): array
     {
-        return $this->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+        try {
+            return $this->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+        } catch (Exception $ex) {
+            dump($ex);
+            throw new Exception($ex->getMessage());
+        }
     }
 
     public function getCacheableParams(): array
     {
         $params = parent::getCacheableParams();
         $params['where'] = $this->where;
+        $params['fields'] = $this->fields;
         return $params;
+    }
+
+    protected function getColumnNamesAsString(string $prepend = 'qb.', string $connector = ','): string
+    {
+        $fields = [];
+        foreach ($this->fields as $field) {
+            $fields[] = $prepend . $field;
+        }
+        if (count($fields) === 0) {
+            return parent::getColumnNamesAsString();
+        }
+        return (parent::getColumnNamesAsString()) . "," . implode($connector, $fields);
     }
 
     /**

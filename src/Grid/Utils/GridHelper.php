@@ -7,7 +7,7 @@ abstract class GridHelper
     /**
      * @param $source
      * @return string
-     * Escapes the source, so that it replaces \ with : avoiding any unnecessary colisions in code structure
+     * Escapes the source, so that it replaces \ with : avoiding any unnecessary collisions in code structure
      */
     public static function escapeSourceClass($source): string
     {
