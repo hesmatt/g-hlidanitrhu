@@ -5,6 +5,7 @@ namespace Matt\SyGridBundle\Grid\Source;
 class EntityGridSourceManager extends AbstractGridSourceManager
 {
     private \Doctrine\ORM\EntityManager $entityManager;
+    private array $where = [];
 
     /**
      * @param \Doctrine\ORM\EntityManager $entityManager
@@ -27,6 +28,15 @@ class EntityGridSourceManager extends AbstractGridSourceManager
         $this->source = $source;
 
         $this->readConfigurationForSource();
+    }
+
+    /**
+     * @param array $where
+     * Allows you to set WHERE for the query
+     */
+    public function setWhere(array $where): void
+    {
+        $this->where = $where;
     }
 
     /**
@@ -71,10 +81,15 @@ class EntityGridSourceManager extends AbstractGridSourceManager
              * @var $column \Matt\SyGridBundle\Grid\Column\GridColumn
              */
             foreach ($this->columns as $column) {
-                if ($column->isSearchable() && ($column->isReflected() || $column->isReflectedKey())) {
+                if ($column->isSearchable() && ($column->getReflectionKey() !== null)) {
                     $queryBuilder->orWhere("qb.{$column->getKey()} LIKE :search");
                     $queryBuilder->setParameter('search', "%{$this->search}%");
                 }
+            }
+        }
+        if (count($this->where) != 0) {
+            foreach ($this->where as $where) {
+                $queryBuilder->andWhere($where);
             }
         }
         return $queryBuilder->getQuery();

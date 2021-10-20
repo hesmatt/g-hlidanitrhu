@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Matt\SyGridBundle\Controller;
 
-use Matt\SyGridBundle\Grid\Column\GridColumn;
-
 class GridController extends \Symfony\Bundle\FrameworkBundle\Controller\AbstractController
 {
     private \Doctrine\ORM\EntityManagerInterface $entityManager;
@@ -24,7 +22,8 @@ class GridController extends \Symfony\Bundle\FrameworkBundle\Controller\Abstract
         $offset = (int)$request->query->get('offset', null);
         $search = $request->query->get('search', null);
 
-        if ($source === null || $sourceType === null) {
+        if ($source === null || $sourceType === null)
+        {
             return new \Symfony\Component\HttpFoundation\Response('Missing required parameters', 403);;
         }
 
@@ -35,7 +34,8 @@ class GridController extends \Symfony\Bundle\FrameworkBundle\Controller\Abstract
             $gridSource->setLimit($limit);
             $gridSource->setOffset($offset);
 
-            if ($search !== null) {
+            if($search !== null)
+            {
                 $gridSource->setSearch($search);
             }
 
@@ -45,10 +45,7 @@ class GridController extends \Symfony\Bundle\FrameworkBundle\Controller\Abstract
 
             $results = $gridSource->getData();
             foreach ($gridSource->columns as $column) {
-                /**
-                 * @var $column GridColumn
-                 */
-                if ($column->hasDataGetter()) {
+                if (!$column->isReflected()) {
                     foreach ($results as &$result) {
                         $cachedFunction = $this->cacheManager->cacheColumnDataGetter(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($source) . "." . $column->getKey());
                         if ($cachedFunction !== null) {
