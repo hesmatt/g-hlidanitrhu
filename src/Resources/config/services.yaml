@@ -2,6 +2,6 @@ services:
   sygrid.controller.grid:
     public: true
     class: Matt\SyGridBundle\Controller\GridController
-    arguments: ['@doctrine.orm.entity_manager']
+    arguments: [ '@doctrine.orm.entity_manager' ]
     calls:
-      - [setContainer, ['@service_container']]
+      - [ setContainer, [ '@service_container' ] ]

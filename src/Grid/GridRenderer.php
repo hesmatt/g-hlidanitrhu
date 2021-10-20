@@ -89,6 +89,7 @@ class GridRenderer
     /**
      * @param string|null $language
      * @throws \Exception
+     * Sets the language from given locale, if not set the language defaults to us_US (English)
      */
     public function setLanguage(string $language): void
     {
@@ -109,7 +110,7 @@ class GridRenderer
      * Adds a single column into sourceManagers column list
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function addColumn(?string $title, string $key, ?callable $dataGetter): \Matt\SyGridBundle\Grid\Column\GridColumn
+    public function addColumn(?string $title, string $key, ?callable $dataGetter = null): \Matt\SyGridBundle\Grid\Column\GridColumn
     {
         $column = new \Matt\SyGridBundle\Grid\Column\GridColumn();
         $column->setTitle($title);

@@ -8,9 +8,9 @@
 <script src="{{ asset('bundles/sygrid/assets/js/gridjs.js') }}"></script>
 <script>
     {% if language is not same as null %}
-        {% set translations = language.getTranslations() %}
+    {% set translations = language.getTranslations() %}
     {% else %}
-        {% set translations = null %}
+    {% set translations = null %}
     {% endif %}
 
     const {{ variableName | raw }} =

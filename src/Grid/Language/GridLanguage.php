@@ -4,7 +4,7 @@ namespace Matt\SyGridBundle\Grid\Language;
 
 class GridLanguage
 {
-   private array $translations;
+    private array $translations;
 
     /**
      * @param array $translations
