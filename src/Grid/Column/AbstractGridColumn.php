@@ -10,18 +10,22 @@ abstract class AbstractGridColumn
 
     /**
      * @param string $title
+     * @return AbstractGridColumn
      */
-    public function setTitle(string $title): void
+    public function setTitle(string $title): AbstractGridColumn
     {
         $this->title = $title;
+        return $this;
     }
 
     /**
      * @param string $key
+     * @return AbstractGridColumn
      */
-    public function setKey(string $key): void
+    public function setKey(string $key): AbstractGridColumn
     {
         $this->key = $key;
+        return $this;
     }
 
     /**
@@ -42,10 +46,12 @@ abstract class AbstractGridColumn
 
     /**
      * @param \Matt\SyGridBundle\Grid\Formatter\GridFormatter|null $formatter
+     * @return AbstractGridColumn
      */
-    public function setFormatter(?\Matt\SyGridBundle\Grid\Formatter\GridFormatter $formatter): void
+    public function setFormatter(?\Matt\SyGridBundle\Grid\Formatter\GridFormatter $formatter): AbstractGridColumn
     {
         $this->formatter = $formatter;
+        return $this;
     }
 
     /**

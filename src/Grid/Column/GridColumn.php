@@ -17,7 +17,6 @@ class GridColumn extends AbstractGridColumn
     public function setReflected(bool $reflected): GridColumn
     {
         $this->reflected = $reflected;
-
         return $this;
     }
 
@@ -44,7 +43,6 @@ class GridColumn extends AbstractGridColumn
     public function setDataGetter(bool $dataGetter): GridColumn
     {
         $this->dataGetter = $dataGetter;
-
         return $this;
     }
 
@@ -69,11 +67,11 @@ class GridColumn extends AbstractGridColumn
 
     /**
      * @param bool $searchable
+     * @return GridColumn
      */
     public function setSearchable(bool $searchable): GridColumn
     {
         $this->searchable = $searchable;
-
         return $this;
     }
 
@@ -92,7 +90,6 @@ class GridColumn extends AbstractGridColumn
     public function setForeign(bool $foreign): GridColumn
     {
         $this->foreign = $foreign;
-
         return $this;
     }
 
