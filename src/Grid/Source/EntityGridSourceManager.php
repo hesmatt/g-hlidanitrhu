@@ -48,15 +48,38 @@ class EntityGridSourceManager extends AbstractGridSourceManager
      * @param array $fields
      * @return void
      * Adds selected fields into query selection
+     * @throws Exception
      */
     public function addFields(array $fields)
     {
-        $this->fields = array_merge($this->fields, $fields);
+        foreach ($fields as $field) {
+            $addField = [
+                'key' => null,
+                'foreign' => false
+            ];
+            if (\is_array($field)) {
+                if (isset($field['foreign'])) {
+                    $addField['foreign'] = $field['foreign'];
+                }
+                if (isset($field['key'])) {
+                    $addField['key'] = $field['key'];
+                }
+            } else {
+                $addField['key'] = $field;
+                $addField['foreign'] = false;
+            }
+            if ($addField['key'] !== null) {
+                $this->fields[] = $addField;
+            } else {
+                throw new Exception("One or more of manually added fields is missing a required column 'key'");
+            }
+        }
     }
 
     /**
      * @return int
      * Counts all available results, so that there's a proper paging
+     * @throws Exception
      */
     public function getCount(): int
     {
@@ -70,13 +93,13 @@ class EntityGridSourceManager extends AbstractGridSourceManager
     /**
      * @return array
      * Gets all data via query
+     * @throws Exception
      */
     public function getData(): array
     {
         try {
             return $this->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
         } catch (Exception $ex) {
-            dump($ex);
             throw new Exception($ex->getMessage());
         }
     }
@@ -91,14 +114,19 @@ class EntityGridSourceManager extends AbstractGridSourceManager
 
     protected function getColumnNamesAsString(string $prepend = 'qb.', string $connector = ','): string
     {
+        $parentReturn = parent::getColumnNamesAsString();
         $fields = [];
         foreach ($this->fields as $field) {
-            $fields[] = $prepend . $field;
+            if (!$field['foreign']) {
+                $fields[] = $prepend . $field['key'];
+            } else {
+                $fields[] = "IDENTITY(" . ($prepend . $field['key']) . ") AS " . $field['key'];
+            }
         }
         if (count($fields) === 0) {
-            return parent::getColumnNamesAsString();
+            return $parentReturn;
         }
-        return (parent::getColumnNamesAsString()) . "," . implode($connector, $fields);
+        return ($parentReturn != null) ? ($parentReturn . "," . implode($connector, $fields)) : (implode($connector, $fields));
     }
 
     /**

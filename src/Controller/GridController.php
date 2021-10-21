@@ -27,22 +27,14 @@ class GridController extends \Symfony\Bundle\FrameworkBundle\Controller\Abstract
         }
 
         if ($sourceType === 'Entity') {
-            //TODO: Add better injector, so that it automatically injects data from cached parameters of source
-            $gridSource = new \Matt\SyGridBundle\Grid\Source\EntityGridSourceManager();
-            $gridSource->setEntityManager($this->entityManager);
-            $gridSource->setSource($source);
-            $gridSource->setLimit($limit);
-            $gridSource->setOffset($offset);
-            $gridSource->setWhere($this->cacheManager->cacheSourceParameters(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($source))['where']);
-            $gridSource->addFields($this->cacheManager->cacheSourceParameters(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($source))['fields']);
+            $gridSource = $this->createSourceManager($sourceType, [
+                'entityManager' => $this->entityManager,
+                'source' => $source,
+                'limit' => $limit,
+                'offset' => $offset,
+                'search' => $search
+            ]);
 
-            if ($search !== null) {
-                $gridSource->setSearch($search);
-            }
-
-            if (($columns = $this->cacheManager->cacheColumns(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($source))) !== null) {
-                $gridSource->setColumns($columns);
-            }
             $results = $gridSource->getData();
             foreach ($gridSource->columns as $column) {
                 if ($column->hasDataGetter()) {
@@ -58,6 +50,39 @@ class GridController extends \Symfony\Bundle\FrameworkBundle\Controller\Abstract
         } else {
             return new \Symfony\Component\HttpFoundation\Response('Non existing source type', 403);
         }
+    }
+
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Exception
+     * Returns grid source with all parameters pre-filled in
+     */
+    private function createSourceManager(string $sourceType, array $params): ?\Matt\SyGridBundle\Grid\Source\AbstractGridSourceManager
+    {
+        if (!isset($params['source']) || $params['source'] == null) {
+            throw new \Exception('Missing source in GridController for source manager creation');
+        }
+
+        $gridSource = null;
+        $cachedParameters = $this->cacheManager->cacheSourceParameters(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($params['source']));
+        $cachedColumns = $this->cacheManager->cacheColumns(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($params['source']));
+        if ($sourceType === 'Entity') {
+            $gridSource = new \Matt\SyGridBundle\Grid\Source\EntityGridSourceManager();
+            $gridSource->setEntityManager($params['entityManager']);
+            $gridSource->setSource($params['source']);
+            $gridSource->setLimit($params['limit']);
+            $gridSource->setOffset($params['offset']);
+            $gridSource->setWhere($cachedParameters['where']);
+            $gridSource->addFields($cachedParameters['fields']);
+            if ($params['search'] !== null) {
+                $gridSource->setSearch($params['search']);
+            }
+            if ($cachedColumns !== null) {
+                $gridSource->setColumns($cachedColumns);
+            }
+        }
+
+        return $gridSource;
     }
 
 }

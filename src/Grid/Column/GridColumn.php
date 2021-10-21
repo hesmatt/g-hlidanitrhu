@@ -8,6 +8,7 @@ class GridColumn extends AbstractGridColumn
     private bool $reflectedKey = false;
     private bool $dataGetter = false;
     private bool $searchable = true;
+    private bool $foreign = false;
 
     /**
      * @param bool $reflected
@@ -77,5 +78,21 @@ class GridColumn extends AbstractGridColumn
     public function isSearchable(): bool
     {
         return $this->searchable;
+    }
+
+    /**
+     * @param bool $foreign
+     */
+    public function setForeign(bool $foreign): void
+    {
+        $this->foreign = $foreign;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isForeign(): bool
+    {
+        return $this->foreign;
     }
 }

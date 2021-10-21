@@ -93,8 +93,10 @@ abstract class AbstractGridSourceManager
          * @var $column \Matt\SyGridBundle\Grid\Column\GridColumn
          */
         foreach ($this->columns as $column) {
-            if ($column->isReflected() || $column->isReflectedKey()) {
+            if (($column->isReflected() || $column->isReflectedKey()) && !$column->isForeign()) {
                 $fields[] = $prepend . $column->getKey();
+            } elseif (($column->isReflected() || $column->isReflectedKey()) && $column->isForeign()) {
+                $fields[] = "IDENTITY(" . ($prepend . $column->getKey()) . ") AS ".$column->getKey();
             }
         }
         return implode($connector, $fields);
