@@ -5,3 +5,10 @@ services:
     arguments: [ '@doctrine.orm.entity_manager' ]
     calls:
       - [ setContainer, [ '@service_container' ] ]
+  sygrid.entity.grid_source_manager:
+    public: true
+    class: Matt\SyGridBundle\Grid\Source\EntityGridSourceManager
+    arguments: [ '@doctrine.orm.entity_manager' ]
+
+  Matt\SyGridBundle\Grid\Source\EntityGridSourceManager:
+    alias: sygrid.entity.grid_source_manager

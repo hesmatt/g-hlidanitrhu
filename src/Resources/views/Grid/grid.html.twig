@@ -18,7 +18,7 @@
         columns: [
             {% for column in columns %}
             {
-                name: '{{ column.getTitle() ?? column.getKey() }}',
+                name: '{{ (column.getTitle() ?? column.getKey()) | trans }}',
                 {% if column.getFormatter() is not same as null %}
                 formatter: {{ column.getFormatter().getCallback() | raw }}
                 {% endif %}

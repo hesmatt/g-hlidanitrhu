@@ -14,6 +14,9 @@ class GridController extends \Symfony\Bundle\FrameworkBundle\Controller\Abstract
         $this->cacheManager = new \Matt\SyGridBundle\Grid\Cache\GridCaching();
     }
 
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
     public function getAction(\Symfony\Component\HttpFoundation\Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $source = $request->query->get('source', null);
@@ -67,8 +70,7 @@ class GridController extends \Symfony\Bundle\FrameworkBundle\Controller\Abstract
         $cachedParameters = $this->cacheManager->cacheSourceParameters(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($params['source']));
         $cachedColumns = $this->cacheManager->cacheColumns(\Matt\SyGridBundle\Grid\Utils\GridHelper::escapeSourceClass($params['source']));
         if ($sourceType === 'Entity') {
-            $gridSource = new \Matt\SyGridBundle\Grid\Source\EntityGridSourceManager();
-            $gridSource->setEntityManager($params['entityManager']);
+            $gridSource = new \Matt\SyGridBundle\Grid\Source\EntityGridSourceManager($this->entityManager);
             $gridSource->setSource($params['source']);
             $gridSource->setLimit($params['limit']);
             $gridSource->setOffset($params['offset']);

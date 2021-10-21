@@ -2,18 +2,25 @@
 
 namespace Matt\SyGridBundle\Grid\Source;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 
 class EntityGridSourceManager extends AbstractGridSourceManager
 {
-    private \Doctrine\ORM\EntityManager $entityManager;
+    private \Doctrine\ORM\EntityManagerInterface $entityManager;
     private array $where = [];
     private array $fields = [];
 
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     /**
-     * @param \Doctrine\ORM\EntityManager $entityManager
+     * @param \Doctrine\ORM\EntityManagerInterface $entityManager
+     * @deprecated EntityManager should auto-set via autowiring now
      */
-    public function setEntityManager(\Doctrine\ORM\EntityManager $entityManager): void
+    public function setEntityManager(\Doctrine\ORM\EntityManagerInterface $entityManager): void
     {
         $this->entityManager = $entityManager;
     }
